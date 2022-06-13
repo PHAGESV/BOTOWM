@@ -1,0 +1,45 @@
+from pyowm import OWM
+from pyowm.utils import config
+from pyowm.utils import timestamps
+
+owm = OWM('ad23e10119a55152aa6579f837c9c69e')
+mgr = owm.weather_manager()
+
+observation = mgr.weather_at_place('Kyiv,UA')
+w = observation.weather
+W = str(w)
+
+H = w.detailed_status
+
+temp = w.temperature('celsius')['temp']
+T = str(temp)
+
+wind = w.wind() ['speed']
+E = str(wind)
+
+#---------------------------------------------------------------------------------------------------------
+
+import telebot
+
+bot = telebot.TeleBot("5147385465:AAFodAsUWmZH_YBdf8e0qQSFGqnXFzlsd58")
+
+@bot.message_handler(commands=['start','help'])
+def send_welcome(message):
+    bot.reply_to(message, "Hello, I will help you dress for the weather! :)")
+    bot.reply_to(message, 'Now Temperature is - ' + T + '°C;' + " Wind - " + E + "m/s; " + H)
+    if (temp <= 0):
+        bot.reply_to(message, "Don't go outside.")
+    elif (temp <= 5):
+        bot.reply_to(message, "You need to wear warm pants and a warm jacket.")
+    elif (temp <= 10):
+        bot.reply_to(message, "You need to wear pants and a warm jacket.")
+    elif (temp <= 15):
+        bot.reply_to(message, "You need to wear pants and a jacket.")
+    elif (temp <= 20):
+        bot.reply_to(message, "You need to wear light pants and a windbreaker.")
+    elif (temp <= 25):
+        bot.reply_to(message, "Put on shorts and a shirt.")
+    elif (temp >= 25 and wind >=0):
+        bot.reply_to(message, "You may not wear clothes at all.")
+
+bot.infinity_polling()
